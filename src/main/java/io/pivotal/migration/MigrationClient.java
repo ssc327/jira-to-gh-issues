@@ -48,6 +48,7 @@ import io.pivotal.util.MarkupEngine;
 import io.pivotal.util.MarkupManager;
 import io.pivotal.util.ProgressTracker;
 import io.pivotal.util.RateLimitHelper;
+import io.ssc327.migration.MilestoneServiceFixed;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -60,7 +61,6 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.CommitService;
 import org.eclipse.egit.github.core.service.LabelService;
-import org.eclipse.egit.github.core.service.MilestoneService;
 import org.joda.time.DateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -207,13 +207,13 @@ public class MigrationClient {
 	}
 
 	public void createMilestones(List<JiraVersion> versions) throws IOException {
-		MilestoneService milestones = new MilestoneService(this.client);
+		MilestoneServiceFixed milestones = new MilestoneServiceFixed(this.client);
 		versions = versions.stream().filter(milestoneFilter).collect(Collectors.toList());
 		logger.info("Creating {} milestones", versions.size());
 		ProgressTracker tracker = new ProgressTracker(versions.size(), 1, 50, logger.isDebugEnabled());
 		for (JiraVersion version : versions) {
 			tracker.updateForIteration();
-			Milestone milestone = new Milestone();
+			io.ssc327.migration.Milestone milestone = new io.ssc327.migration.Milestone();
 			milestone.setTitle(version.getName());
 			milestone.setState(version.isReleased() ? "closed" : "open");
 			if (version.getReleaseDate() != null) {
@@ -221,7 +221,8 @@ public class MigrationClient {
 				milestone.setCreatedAt(date);
 				milestone.setDueOn(date);
 			}
-			milestones.createMilestone(repositoryIdProvider, milestone);
+			milestone.setDescription("placeholder");
+			milestones.createMilestoneFixed(repositoryIdProvider, milestone);
 		}
 		tracker.stopProgress();
 	}
@@ -345,7 +346,7 @@ public class MigrationClient {
 
 	private Map<String, Milestone> retrieveMilestones() {
 		try {
-			return new MilestoneService(this.client)
+			return new MilestoneServiceFixed(this.client)
 					.getMilestones(repositoryIdProvider, "all")
 					.stream()
 					.collect(Collectors.toMap(Milestone::getTitle, Function.identity()));
