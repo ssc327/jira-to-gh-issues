@@ -19,11 +19,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.pivotal.jira.JiraClient;
 import io.pivotal.jira.JiraConfig;
@@ -112,6 +114,20 @@ public class MigrationApp implements CommandLineRunner {
 			String migrateJql = jiraConfig.getMigrateJql();
 			List<JiraIssue> issues = jira.findIssuesVotesAndCommits(migrateJql, context::filterRemaingIssuesToImport);
 
+			// get a map of all epics and their child stories
+			Map<String, List<JiraIssue>> epic2IssuesMap = issues.stream()
+				.filter(issue -> issue.getFields().getEpicLink() != null)
+					.collect(Collectors.toMap(
+								issue -> issue.getFields().getEpicLink(), 
+								issue -> List.of(issue),
+								(x,y) -> Stream.concat(x.stream(), y.stream()).collect(Collectors.toList())
+							));			
+			
+			// add child stories of an epic as subtasks to it
+			issues.stream()
+				.filter(issue -> epic2IssuesMap.containsKey(issue.getKey()))
+				.forEach(issue -> issue.getFields().setSubtasks(epic2IssuesMap.get(issue.getKey())));
+			
 			List<String> restrictedIssueKeys = issues.stream()
 					.filter(issue -> !issue.getFields().isPublic())
 					.map(JiraIssue::getKey).collect(Collectors.toList());

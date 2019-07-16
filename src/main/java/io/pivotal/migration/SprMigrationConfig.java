@@ -81,6 +81,7 @@ public class SprMigrationConfig {
 		fieldValueHandler.addMapping(FieldType.ISSUE_TYPE, "Pruning", "task");
 		fieldValueHandler.addMapping(FieldType.ISSUE_TYPE, "Task", "task");
 		fieldValueHandler.addMapping(FieldType.ISSUE_TYPE, "Sub-task", "task");
+		fieldValueHandler.addMapping(FieldType.ISSUE_TYPE, "Epic", "epic");
 		// "Backport" - ignore
 
 		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Deferred", "declined");

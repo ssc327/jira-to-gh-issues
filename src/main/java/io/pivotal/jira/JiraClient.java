@@ -110,15 +110,15 @@ public class JiraClient {
 	}
 
 	private Flux<JiraIssue> getIssues(String jql) {
-		int pageSize = 1000;
-		logger.info("Loading issues (1000 per page) for jql=\"{}\"", jql);
+		int pageSize = 100;
+		logger.info("Loading issues ({} per page) for jql=\"{}\"",pageSize, jql);
 		int concurrency = 5; // we could go higher but each brings large amount of data to convert in parallel
-		return Flux.range(0, MAX_ISSUE_COUNT_HINT / 1000)
+		return Flux.range(0, MAX_ISSUE_COUNT_HINT / pageSize)
 				.flatMap(page -> {
 					int startAt = page * pageSize;
 					System.out.print((page + 1) + " ");
 					return webClient.get()
-							.uri("/search?maxResults=1000&startAt={0}&jql={jql}&fields=" + JiraIssue.FIELD_NAMES, startAt, jql)
+							.uri("/search?maxResults={pageSize}&startAt={0}&jql={jql}&fields=" + JiraIssue.FIELD_NAMES,pageSize, startAt, jql)
 							.retrieve()
 							.bodyToMono(JiraSearchResult.class)
 							.onErrorResume(ex -> {
