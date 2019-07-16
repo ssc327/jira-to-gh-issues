@@ -446,6 +446,9 @@ public class MigrationClient {
 		if (fields.getReferenceUrl() != null) {
 			jiraDetails += "\n**Reference URL:** " + fields.getReferenceUrl() + "\n";
 		}
+		if(fields.getEpicLink() !=null) {
+			jiraDetails += "\n**Epic Link:** " + fields.getEpicLink() + "\n";
+		}
 		List<JiraAttachment> attachments = fields.getAttachment();
 		if (!attachments.isEmpty()) {
 			jiraDetails += attachments.stream()
