@@ -52,7 +52,6 @@ public class MigrationApp implements CommandLineRunner {
 
 	private static final Logger logger = LogManager.getLogger(MigrationApp.class);
 
-
 	@Autowired
 	JiraClient jira;
 
@@ -62,11 +61,9 @@ public class MigrationApp implements CommandLineRunner {
 	@Autowired
 	JiraConfig jiraConfig;
 
-
 	public static void main(String args[]) {
 		SpringApplication.run(MigrationApp.class);
 	}
-
 
 	@Override
 	public void run(String... strings) throws Exception {
@@ -75,7 +72,7 @@ public class MigrationApp implements CommandLineRunner {
 		File failuresFile = new File("github-migration-failures.txt");
 
 		try (FileWriter mappingsWriter = new FileWriter(mappingsFile, true);
-			 FileWriter failuresWriter = new FileWriter(failuresFile, true)) {
+				FileWriter failuresWriter = new FileWriter(failuresFile, true)) {
 
 			String startTime = DateTimeFormat.forStyle("ML").print(DateTime.now());
 			failuresWriter.write("==================================\n" + startTime + "\n");
@@ -89,11 +86,10 @@ public class MigrationApp implements CommandLineRunner {
 				// Delete if github.delete-create-repository-slug=true AND 0 commits
 				if (github.deleteRepository()) {
 					Assert.isTrue(issueMappings.isEmpty(),
-							"Repository was deleted but github-issue-mappings.properties has content." +
-									"Please delete the file, or save the content elsewhere and then delete.");
+							"Repository was deleted but github-issue-mappings.properties has content."
+									+ "Please delete the file, or save the content elsewhere and then delete.");
 				}
-			}
-			catch (HttpClientErrorException ex) {
+			} catch (HttpClientErrorException ex) {
 				if (ex.getStatusCode().value() != HttpStatus.NOT_FOUND.value()) {
 					throw ex;
 				}
@@ -105,8 +101,7 @@ public class MigrationApp implements CommandLineRunner {
 				JiraProject project = jira.findProject(jiraConfig.getProjectId());
 				github.createMilestones(project.getVersions());
 				github.createLabels();
-			}
-			else {
+			} else {
 				// If there are issue mappings, we'll assume it's "restart after failure" and
 				// that milestones and labels have already been created,
 			}
@@ -116,24 +111,21 @@ public class MigrationApp implements CommandLineRunner {
 
 			// get a map of all epics and their child stories
 			Map<String, List<JiraIssue>> epic2IssuesMap = issues.stream()
-				.filter(issue -> issue.getFields().getEpicLink() != null)
-					.collect(Collectors.toMap(
-								issue -> issue.getFields().getEpicLink(), 
-								issue -> List.of(issue),
-								(x,y) -> Stream.concat(x.stream(), y.stream()).collect(Collectors.toList())
-							));			
-			
+					.filter(issue -> issue.getFields().getEpicLink() != null)
+					.collect(Collectors.toMap(issue -> issue.getFields().getEpicLink(), issue -> {
+						List<JiraIssue> x = new ArrayList<>();
+						x.add(issue);
+						return x;
+					}, (x, y) -> Stream.concat(x.stream(), y.stream()).collect(Collectors.toList())));
+
 			// add child stories of an epic as subtasks to it
-			issues.stream()
-				.filter(issue -> epic2IssuesMap.containsKey(issue.getKey()))
-				.forEach(issue -> issue.getFields().setSubtasks(epic2IssuesMap.get(issue.getKey())));
-			
-			List<String> restrictedIssueKeys = issues.stream()
-					.filter(issue -> !issue.getFields().isPublic())
+			issues.stream().filter(issue -> epic2IssuesMap.containsKey(issue.getKey()))
+					.forEach(issue -> issue.getFields().setSubtasks(epic2IssuesMap.get(issue.getKey())));
+
+			List<String> restrictedIssueKeys = issues.stream().filter(issue -> !issue.getFields().isPublic())
 					.map(JiraIssue::getKey).collect(Collectors.toList());
 
-			List<JiraIssue> publicIssues = issues.stream()
-					.filter(issue -> issue.getFields().isPublic())
+			List<JiraIssue> publicIssues = issues.stream().filter(issue -> issue.getFields().isPublic())
 					.collect(Collectors.toList());
 
 			github.createIssues(publicIssues, restrictedIssueKeys, context);
