@@ -84,6 +84,9 @@ public class Ssc327MigrationConfig {
 		handler.addLabelHandler(LabelFactories.STATUS_LABEL.apply("waiting-for-triage"), issue ->
 				issue.getFields().getResolution() == null && issue.getFixVersion() == null);
 
+		handler.addLabelHandler(LabelFactories.STATUS_LABEL.apply("in-progress"), issue ->
+		issue.getFields().getStatus().getName().equals("In Progress"));
+
 		handler.addLabelHandler(LabelFactories.HAS_LABEL.apply("votes-jira"), issue ->
 				issue.getVotes() >= 10);
 
