@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 
 public class LabelHandlerTests {
 
-	private final LabelHandler labelHandler = new SprMigrationConfig().labelHandler();
+	private final LabelHandler labelHandler = new Ssc327MigrationConfig().labelHandler();
 
 
 	@Test

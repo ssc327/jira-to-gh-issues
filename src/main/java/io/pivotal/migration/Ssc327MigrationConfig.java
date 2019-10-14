@@ -18,21 +18,21 @@ package io.pivotal.migration;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import io.pivotal.github.GithubIssue;
 import io.pivotal.github.ImportGithubIssue;
 import io.pivotal.jira.JiraFixVersion;
 import io.pivotal.jira.JiraIssue;
 import io.pivotal.migration.FieldValueLabelHandler.FieldType;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 
 /**
  * Configuration for migration of SPR Jira.
  */
 @Configuration
-public class SprMigrationConfig {
+public class Ssc327MigrationConfig {
 
 	private static final List<String> skipVersions =
 			Arrays.asList("Contributions Welcome", "Pending Closure", "Waiting for Triage");
@@ -47,32 +47,6 @@ public class SprMigrationConfig {
 	public LabelHandler labelHandler() {
 
 		FieldValueLabelHandler fieldValueHandler = new FieldValueLabelHandler();
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Caching", "core");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Core", "core");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Core:AOP", "core");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Core:DI", "core");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Core:Environment", "core");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Core:SpEL", "core");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "EJB", "core");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "JMX", "core");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Task", "core");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Data", "data");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Data:JDBC", "data");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Data:ORM", "data");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "OXM", "data");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Transaction", "data");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "JMS", "messaging");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Messaging", "messaging");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Test", "test");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Messaging:WebSocket", "web");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Reactive", "web");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Remoting", "web");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Web", "web");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Web:Client", "web");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "Web:Portlet", "web");
-		fieldValueHandler.addMapping(FieldType.COMPONENT, "[Documentation]", "documentation", LabelFactories.TYPE_LABEL);
-		// "[Build]" - not used
-		// "[Other]" - bad idea
 
 		fieldValueHandler.addMapping(FieldType.ISSUE_TYPE, "Bug", "bug");
 		fieldValueHandler.addMapping(FieldType.ISSUE_TYPE, "New Feature", "enhancement");
@@ -82,12 +56,12 @@ public class SprMigrationConfig {
 		fieldValueHandler.addMapping(FieldType.ISSUE_TYPE, "Task", "task");
 		fieldValueHandler.addMapping(FieldType.ISSUE_TYPE, "Sub-task", "task");
 		fieldValueHandler.addMapping(FieldType.ISSUE_TYPE, "Epic", "epic");
-		// "Backport" - ignore
 
-		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Deferred", "declined");
-		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Won't Do", "declined");
-		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Won't Fix", "declined");
-		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Works as Designed", "declined");
+		final String DECLINED = "declined";
+		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Deferred", DECLINED);
+		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Won't Do", DECLINED);
+		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Won't Fix", DECLINED);
+		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Works as Designed", DECLINED);
 		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Duplicate", "duplicate");
 		fieldValueHandler.addMapping(FieldType.RESOLUTION, "Invalid", "invalid");
 		// "Complete", "Fixed", "Done" - it should be obvious if it has fix version and is closed

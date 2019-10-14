@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
  */
 public class IssueProcessorTests {
 
-	private final IssueProcessor issueProcessor = new SprMigrationConfig().issueProcessor();
+	private final IssueProcessor issueProcessor = new Ssc327MigrationConfig().issueProcessor();
 
 
 	@Test
