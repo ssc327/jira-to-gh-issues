@@ -96,6 +96,7 @@ public class Ssc327MigrationConfig {
 		handler.addLabelSupersede("type: bug", "type: regression");
 		handler.addLabelSupersede("type: task", "type: documentation");
 		handler.addLabelSupersede("status: waiting-for-triage", "status: waiting-for-feedback");
+		handler.addLabelSupersede("status: waiting-for-triage", "status: in-progress");
 
 		// In Jira users pick the type when opening ticket. It doesn't work that way in GitHub.
 		handler.addLabelRemoval("status: waiting-for-triage", label -> label.startsWith("type: "));
