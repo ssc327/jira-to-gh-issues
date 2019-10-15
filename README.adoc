@@ -1,3 +1,5 @@
+Note that commits went against SprTriage branch but that is wrong. Spr triage was from Spring project, should have been done to a different branch. Likewise many spring config classes and pacakges were used, they should not have been.
+
 A project for migrating issues from JIRA to GitHub.
 A sample of the migration from Spring Security's JIRA to GitHub issues can be found at https://github.com/rwinch/spring-security-migrate-issues/issues[rwinch/spring-security-migrate-issues]
 See `src/main/resources/application.properties` for settings.
